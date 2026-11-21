@@ -7,28 +7,50 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/fashion_store";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "giveyouractualdbpassword";
+    private static final String URL = getSetting(
+            "DB_URL",
+            "jdbc:mysql://localhost:3306/fashion_store"
+    );
+
+    private static final String USERNAME = getSetting(
+            "DB_USERNAME",
+            "root"
+    );
+
+    private static final String PASSWORD = getSetting(
+            "DB_PASSWORD",
+            ""
+    );
+
+    private static String getSetting(String name, String defaultValue) {
+        String value = System.getenv(name);
+
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+
+        return value;
+    }
 
     public static Connection getConnection() {
-
-        Connection connection = null;
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            Connection connection = DriverManager.getConnection(
+                    URL, USERNAME, PASSWORD
+            );
 
             System.out.println("Database connected successfully!");
+
+            return connection;
 
         } catch (ClassNotFoundException | SQLException e) {
 
             System.out.println("Database connection failed!");
             e.printStackTrace();
 
+            return null;
         }
-
-        return connection;
     }
 }
